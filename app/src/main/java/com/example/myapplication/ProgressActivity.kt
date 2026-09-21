@@ -6,10 +6,12 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.card.MaterialCardView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 class ProgressActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,12 +19,90 @@ class ProgressActivity : BaseActivity() {
         setContentView(R.layout.activity_progress)
 
         loadProgressData()
+        loadCloudFeedData()
         setupBottomNavigation(R.id.nav_progress)
     }
 
     override fun onResume() {
         super.onResume()
         loadProgressData()
+        loadCloudFeedData()
+    }
+
+    private fun loadCloudFeedData() {
+        val tvCloudHistoryStatus = findViewById<TextView>(R.id.tvCloudHistoryStatus) ?: return
+        val llCloudHistoryContainer = findViewById<LinearLayout>(R.id.llCloudHistoryContainer) ?: return
+        val cvNoCloudHistory = findViewById<MaterialCardView>(R.id.cvNoCloudHistory) ?: return
+
+        lifecycleScope.launch {
+            try {
+                val apiService = WorkoutApiService.create()
+                val cloudWorkoutsMap = apiService.getCloudWorkouts()
+
+                // Clear previous entries while preserving the empty-state template card
+                for (i in llCloudHistoryContainer.childCount - 1 downTo 0) {
+                    val child = llCloudHistoryContainer.getChildAt(i)
+                    if (child.id != R.id.cvNoCloudHistory) {
+                        llCloudHistoryContainer.removeViewAt(i)
+                    }
+                }
+
+                if (cloudWorkoutsMap != null && cloudWorkoutsMap.isNotEmpty()) {
+                    cvNoCloudHistory.visibility = View.GONE
+                    val dateFormat = SimpleDateFormat("MMM dd, yyyy • HH:mm", Locale.getDefault())
+                    val cloudWorkoutsList = cloudWorkoutsMap.values.toList()
+
+                    // Show top 5 cloud synced entries
+                    for (workout in cloudWorkoutsList.takeLast(5).reversed()) {
+                        val historyCard = MaterialCardView(this@ProgressActivity).apply {
+                            layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            ).apply { setMargins(0, 0, 0, 16) }
+                            radius = 16f * resources.displayMetrics.density
+                            cardElevation = 2f
+                            setCardBackgroundColor(getColorStateList(R.color.app_surface))
+                            strokeWidth = 0
+                        }
+
+                        val innerLayout = LinearLayout(this@ProgressActivity).apply {
+                            orientation = LinearLayout.VERTICAL
+                            setPadding(48, 32, 48, 32)
+                        }
+
+                        innerLayout.addView(TextView(this@ProgressActivity).apply {
+                            text = workout.workoutTitle
+                            setTextColor(getColor(R.color.orange_primary))
+                            textSize = 15f
+                            setTypeface(null, android.graphics.Typeface.BOLD)
+                        })
+
+                        innerLayout.addView(TextView(this@ProgressActivity).apply {
+                            text = "Duration: ${workout.durationMinutes} mins • Synced via Firebase Cloud"
+                            setTextColor(getColor(R.color.text_primary))
+                            textSize = 13f
+                            setPadding(0, 4, 0, 0)
+                        })
+
+                        innerLayout.addView(TextView(this@ProgressActivity).apply {
+                            text = dateFormat.format(Date(workout.timestamp))
+                            setTextColor(getColor(R.color.text_secondary))
+                            textSize = 11f
+                            setPadding(0, 4, 0, 0)
+                        })
+
+                        historyCard.addView(innerLayout)
+                        llCloudHistoryContainer.addView(historyCard)
+                    }
+                } else {
+                    cvNoCloudHistory.visibility = View.VISIBLE
+                    tvCloudHistoryStatus.text = "Connected to Firebase! No cloud entries stored yet."
+                }
+            } catch (e: Exception) {
+                cvNoCloudHistory.visibility = View.VISIBLE
+                tvCloudHistoryStatus.text = "Error: ${e.localizedMessage ?: "Connection failure"}. Check Firebase Rules tab or internet."
+            }
+        }
     }
 
     private fun loadProgressData() {

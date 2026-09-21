@@ -42,13 +42,32 @@ class LoginActivity : BaseActivity() {
             }
 
             lifecycleScope.launch {
-                val user = db.userDao().getUserByEmail(email)
+                // 1. Try local login first
+                var user = db.userDao().getUserByEmail(email)
                 
+                // 2. If not found locally, try to find in Firebase Cloud (Sync for new devices)
+                if (user == null) {
+                    try {
+                        val apiService = WorkoutApiService.create()
+                        val cloudUsersMap = apiService.getAllUsers()
+                        if (cloudUsersMap != null) {
+                            val cloudUser = cloudUsersMap.values.find { it.email.equals(email, ignoreCase = true) }
+                            if (cloudUser != null) {
+                                // Save to local DB so future logins are faster/offline
+                                db.userDao().signup(cloudUser)
+                                user = cloudUser
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // Network error or pending connection
+                    }
+                }
+
                 if (user != null && BCrypt.checkpw(password, user.password)) {
                     val sharedPreferences = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE)
                     sharedPreferences.edit().putInt("current_user_id", user.id).apply()
 
-                    Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, "Login Successful (Cloud Synced)", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()

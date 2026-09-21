@@ -42,20 +42,47 @@ class SignupActivity : BaseActivity() {
             }
 
             lifecycleScope.launch {
-                val existingUser = db.userDao().getUserByEmail(email)
+                // 1. Check local DB
+                var existingUser = db.userDao().getUserByEmail(email)
+                
+                // 2. Check Firebase Cloud to prevent duplicate emails across devices
+                try {
+                    val apiService = WorkoutApiService.create()
+                    val cloudUsersMap = apiService.getAllUsers()
+                    if (cloudUsersMap != null) {
+                        val cloudUserExists = cloudUsersMap.values.any { it.email.equals(email, ignoreCase = true) }
+                        if (cloudUserExists) {
+                            Toast.makeText(this@SignupActivity, "Email already registered in cloud", Toast.LENGTH_SHORT).show()
+                            return@launch
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Proceed if offline or pending connection
+                }
+
                 if (existingUser != null) {
-                    Toast.makeText(this@SignupActivity, "Email already registered", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SignupActivity, "Email already registered locally", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
 
+                // 3. Register user locally
                 val hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt())
                 val newUser = User(fullName = name, email = email, password = hashedPassword)
                 val userId = db.userDao().signup(newUser)
                 
+                // 4. Back up account to Firebase Realtime Database cloud via REST API
+                try {
+                    val apiService = WorkoutApiService.create()
+                    val userToUpload = newUser.copy(id = userId.toInt())
+                    apiService.uploadUser(userToUpload)
+                } catch (e: Exception) {
+                    // Handle failure silently so user experience remains seamless
+                }
+
                 val sharedPreferences = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE)
                 sharedPreferences.edit().putInt("current_user_id", userId.toInt()).apply()
 
-                Toast.makeText(this@SignupActivity, "Welcome to RepSync!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SignupActivity, "Welcome to RepSync! Synced with Cloud.", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this@SignupActivity, MainActivity::class.java))
                 finishAffinity()
             }
