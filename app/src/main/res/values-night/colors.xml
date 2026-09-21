@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="orange_primary">#FF7043</color>
+    <color name="orange_dark">#E64A19</color>
+    <color name="orange_light">#FFCCBC</color>
+
+    <!-- UI Surfaces (Dark Mode) -->
+    <color name="app_background">#121212</color>
+    <color name="app_surface">#1E1E1E</color>
+    <color name="app_surface_variant">#2C2C2C</color>
+
+    <!-- Text Tones (Dark Mode) -->
+    <color name="text_primary">#E8EAED</color>
+    <color name="text_secondary">#9AA0A6</color>
+    <color name="text_tertiary">#80868B</color>
+    <color name="text_on_orange">#000000</color>
+
+    <!-- Accents -->
+    <color name="success_green">#81C784</color>
+    <color name="error_red">#F28B82</color>
+</resources>
