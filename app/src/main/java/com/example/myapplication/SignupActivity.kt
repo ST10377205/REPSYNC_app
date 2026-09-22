@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.ViewCompat
@@ -13,7 +14,14 @@ import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 import org.mindrot.jbcrypt.BCrypt
 
+/**
+ * SignupActivity - Handles new user registration.
+ * Includes validation for name (letters only) and email format.
+ */
 class SignupActivity : BaseActivity() {
+
+    private val TAG = "SignupActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
@@ -36,12 +44,25 @@ class SignupActivity : BaseActivity() {
             val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
-            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            // Input Validation using ValidationUtils
+            if (!ValidationUtils.isValidName(name)) {
+                etName.error = "Name must contain only letters and be at least 2 characters"
+                return@setOnClickListener
+            }
+
+            if (!ValidationUtils.isValidEmail(email)) {
+                etEmail.error = "Please enter a valid email address (e.g. name@gmail.com)"
+                return@setOnClickListener
+            }
+
+            if (!ValidationUtils.isValidPassword(password)) {
+                etPassword.error = "Password must be at least 6 characters"
                 return@setOnClickListener
             }
 
             lifecycleScope.launch {
+                Log.d(TAG, "Starting signup process for: $email")
+                
                 // 1. Check local DB
                 var existingUser = db.userDao().getUserByEmail(email)
                 
@@ -52,15 +73,17 @@ class SignupActivity : BaseActivity() {
                     if (cloudUsersMap != null) {
                         val cloudUserExists = cloudUsersMap.values.any { it.email.equals(email, ignoreCase = true) }
                         if (cloudUserExists) {
+                            Log.w(TAG, "Signup failed: Email exists in cloud database")
                             Toast.makeText(this@SignupActivity, "Email already registered in cloud", Toast.LENGTH_SHORT).show()
                             return@launch
                         }
                     }
                 } catch (e: Exception) {
-                    // Proceed if offline or pending connection
+                    Log.e(TAG, "Cloud email check failed, proceeding with local check", e)
                 }
 
                 if (existingUser != null) {
+                    Log.w(TAG, "Signup failed: Email exists in local database")
                     Toast.makeText(this@SignupActivity, "Email already registered locally", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
@@ -75,8 +98,9 @@ class SignupActivity : BaseActivity() {
                     val apiService = WorkoutApiService.create()
                     val userToUpload = newUser.copy(id = userId.toInt())
                     apiService.uploadUser(userToUpload)
+                    Log.i(TAG, "User profile successfully backed up to Firebase Cloud")
                 } catch (e: Exception) {
-                    // Handle failure silently so user experience remains seamless
+                    Log.e(TAG, "Cloud backup failed, user saved locally only", e)
                 }
 
                 val sharedPreferences = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE)

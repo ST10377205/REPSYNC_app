@@ -1,19 +1,31 @@
 package com.example.myapplication
 
+import android.util.Patterns
+
+/**
+ * ValidationUtils - Utility class for validating user input fields.
+ */
 object ValidationUtils {
 
-    private val EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
-
+    /**
+     * Validates if the email is a proper email format.
+     */
     fun isValidEmail(email: String): Boolean {
-        return email.isNotEmpty() && EMAIL_REGEX.matches(email)
+        return email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
+    /**
+     * Validates if the password meets security requirements (min 6 characters).
+     */
     fun isValidPassword(password: String): Boolean {
-        // At least 6 characters for basic security
         return password.length >= 6
     }
 
+    /**
+     * Validates if the name contains only letters and spaces, and is at least 2 characters.
+     */
     fun isValidName(name: String): Boolean {
-        return name.trim().length >= 2
+        val nameRegex = "^[a-zA-Z\\s]+$".toRegex()
+        return name.trim().length >= 2 && nameRegex.matches(name)
     }
 }
