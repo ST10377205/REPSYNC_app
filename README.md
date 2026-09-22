@@ -6,15 +6,6 @@ RepSync follows a **hybrid offline-first architecture**, allowing users to acces
 
 ---
 
-## 👥 Group Members
-
-- **[NAME 1]**
-- **[NAME 2]**
-- **[NAME 3]**
-- **[NAME 4]**
-
----
-
 ## 📱 About RepSync
 
 RepSync provides a comprehensive fitness companion for managing training activities and monitoring progress. The application focuses on workout planning, exercise information, live tracking, and advanced progress analytics. It is designed to remain fully functional in environments where an internet connection may not always be available.
