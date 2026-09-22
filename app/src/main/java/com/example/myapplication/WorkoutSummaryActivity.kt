@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.ViewCompat
@@ -11,10 +12,18 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 
+/**
+ * WorkoutSummaryActivity - Shows details at the end of a session.
+ * Integrates with Retrofit WorkoutApiService to push completed data online.
+ */
 class WorkoutSummaryActivity : BaseActivity() {
+
+    private val TAG = "WorkoutSummary"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workout_summary)
+        Log.d(TAG, "onCreate: Initializing Workout Summary Layout Screen")
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.workoutSummaryMain)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -25,10 +34,12 @@ class WorkoutSummaryActivity : BaseActivity() {
         displaySummaryData()
 
         findViewById<MaterialButton>(R.id.btnSaveWorkout).setOnClickListener {
+            Log.d(TAG, "Save button clicked - preparing data packages")
             saveAndExit()
         }
 
         findViewById<MaterialButton>(R.id.btnDiscardWorkout).setOnClickListener {
+            Log.d(TAG, "Discard button clicked - canceling session data generation")
             finish()
         }
     }
@@ -64,7 +75,7 @@ class WorkoutSummaryActivity : BaseActivity() {
         val workoutTitle = intent.getStringExtra("ROUTINE_TITLE") ?: "General Workout"
 
         if (userId != -1) {
-            // 1. Save Locally
+            Log.i(TAG, "Writing progress markers to offline storage cache for userId: $userId")
             val currentDuration = sharedPreferences.getInt("user_duration_$userId", 0)
             sharedPreferences.edit().apply {
                 putInt("user_duration_$userId", currentDuration + (sessionSeconds / 60))
@@ -72,9 +83,10 @@ class WorkoutSummaryActivity : BaseActivity() {
                 apply()
             }
 
-            // 2. REST API Integration (Send Data to Online Database)
+            // REST API Integration asynchronously handled through background context
             lifecycleScope.launch {
                 try {
+                    Log.i(TAG, "Dispatching outbound POST REST api payload to Firebase Cloud servers")
                     val apiService = WorkoutApiService.create()
                     val cloudWorkout = CloudWorkout(
                         userId = userId,
@@ -82,12 +94,11 @@ class WorkoutSummaryActivity : BaseActivity() {
                         durationMinutes = sessionSeconds / 60
                     )
                     
-                    // This satisfies the "Send data to REST API" requirement
                     val response = apiService.uploadWorkout(cloudWorkout)
-                    
+                    Log.d(TAG, "Firebase Server responded with unique identification token: ${response.id}")
                     Toast.makeText(this@WorkoutSummaryActivity, "Cloud Sync Successful: ID ${response.id}", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
-                    // Fail silently but log for debugging
+                    Log.e(TAG, "Network transport failure caught gracefully. Defaulting to local offline storage schema.", e)
                     Toast.makeText(this@WorkoutSummaryActivity, "Saved locally. Cloud sync pending connection.", Toast.LENGTH_SHORT).show()
                 }
 
