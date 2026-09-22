@@ -43,29 +43,8 @@ RepSync provides a comprehensive fitness companion for managing training activit
 
 RepSync uses a hybrid **offline-first architecture** to ensure stability and performance.
 
-```text
-                    ┌──────────────────────┐
-                    │   RepSync Android    │
-                    │     Application      │
-                    └──────────┬───────────┘
-                               │
-                ┌──────────────┴──────────────┐
-                │                             │
-        ┌───────▼────────┐           ┌────────▼─────────┐
-        │  Room Database │           │   Retrofit REST  │
-        │     SQLite     │           │       APIs       │
-        └───────┬────────┘           └────────┬─────────┘
-                │                             │
-                │                    ┌────────┴─────────┐
-                │             ┌──────▼──────┐    ┌──────▼──────┐
-                │             │  Firebase   │    │ Public Tip  │
-                │             │  Cloud API  │    │  Advice API │
-                │             └─────────────┘    └─────────────┘
-                │
-                └──── Local / Offline Storage
-```
 
----
+
 
 ## 🌐 Dual REST API Integration
 
@@ -135,7 +114,7 @@ RepSync is designed to be resilient. When offline:
 
 ---
 
-## 🔗 Submission Links
+## 🔗 GITHUB AND YOUTUBE Links
 
 - **GitHub Repository:** [PASTE YOUR GITHUB LINK HERE]
 - **YouTube Demonstration Video:** [PASTE YOUR UNLISTED YOUTUBE VIDEO LINK HERE]
