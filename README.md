@@ -3,6 +3,14 @@
 RepSync is a modern Android fitness application developed using Kotlin, designed to help users plan, track, and analyze their workouts in one unified platform. The app is built with a focus on reliability, data security, and seamless synchronization, ensuring users can maintain their fitness journey regardless of network availability.
 
 RepSync follows a **hybrid offline-first architecture**, allowing users to access and manage information locally even without an internet connection. When connectivity is available, data is automatically synchronised with the cloud through secure REST API integrations.
+---
+GROUP MEMBERS
+
+Lusani Ramulifho ST10439607 
+
+Kamohelo Simata st10377205
+
+ Azwidali Manyaga st10440560
 
 ---
 
@@ -117,4 +125,4 @@ RepSync is designed to be resilient. When offline:
 ## 🔗 GITHUB AND YOUTUBE Links
 
 - **GitHub Repository:** https://github.com/ST10377205/REPSYNC_app 
-- **YouTube Demonstration Video:** [PASTE YOUR UNLISTED YOUTUBE VIDEO LINK HERE]
+- **YouTube Demonstration Video:** https://youtu.be/0hu_loixIoE?si=luCidYTS5_V3E0hq 
