@@ -86,7 +86,7 @@ class WorkoutSummaryActivity : BaseActivity() {
             // REST API Integration asynchronously handled through background context
             lifecycleScope.launch {
                 try {
-                    Log.i(TAG, "Dispatching outbound POST REST api payload to Firebase Cloud servers")
+                    Log.i(TAG, "Dispatching outbound POST REST api payload to Firebase Cloud servers for userId: $userId")
                     val apiService = WorkoutApiService.create()
                     val cloudWorkout = CloudWorkout(
                         userId = userId,
@@ -94,9 +94,10 @@ class WorkoutSummaryActivity : BaseActivity() {
                         durationMinutes = sessionSeconds / 60
                     )
                     
-                    val response = apiService.uploadWorkout(cloudWorkout)
+                    // Upload specifically under the user's ID path to prevent data mixing
+                    val response = apiService.uploadWorkout(userId, cloudWorkout)
                     Log.d(TAG, "Firebase Server responded with unique identification token: ${response.id}")
-                    Toast.makeText(this@WorkoutSummaryActivity, "Cloud Sync Successful: ID ${response.id}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@WorkoutSummaryActivity, "Cloud Sync Successful", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
                     Log.e(TAG, "Network transport failure caught gracefully. Defaulting to local offline storage schema.", e)
                     Toast.makeText(this@WorkoutSummaryActivity, "Saved locally. Cloud sync pending connection.", Toast.LENGTH_SHORT).show()

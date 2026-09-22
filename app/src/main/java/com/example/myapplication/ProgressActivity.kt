@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
@@ -13,7 +14,14 @@ import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 
+/**
+ * ProgressActivity - Displays user fitness progress and cloud-synced workout history.
+ * Optimized to fetch only data belonging to the logged-in user.
+ */
 class ProgressActivity : BaseActivity() {
+
+    private val TAG = "ProgressActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_progress)
@@ -34,10 +42,20 @@ class ProgressActivity : BaseActivity() {
         val llCloudHistoryContainer = findViewById<LinearLayout>(R.id.llCloudHistoryContainer) ?: return
         val cvNoCloudHistory = findViewById<MaterialCardView>(R.id.cvNoCloudHistory) ?: return
 
+        val sharedPreferences = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE)
+        val userId = sharedPreferences.getInt("current_user_id", -1)
+
+        if (userId == -1) {
+            tvCloudHistoryStatus.text = "Please log in to view cloud history."
+            return
+        }
+
         lifecycleScope.launch {
             try {
+                Log.d(TAG, "Fetching cloud workouts for userId: $userId")
                 val apiService = WorkoutApiService.create()
-                val cloudWorkoutsMap = apiService.getCloudWorkouts()
+                // Optimized fetch: Only retrieves workouts for this specific user
+                val cloudWorkoutsMap = apiService.getUserCloudWorkouts(userId)
 
                 // Clear previous entries while preserving the empty-state template card
                 for (i in llCloudHistoryContainer.childCount - 1 downTo 0) {
@@ -52,7 +70,7 @@ class ProgressActivity : BaseActivity() {
                     val dateFormat = SimpleDateFormat("MMM dd, yyyy • HH:mm", Locale.getDefault())
                     val cloudWorkoutsList = cloudWorkoutsMap.values.toList()
 
-                    // Show top 5 cloud synced entries
+                    // Show top 5 cloud synced entries for this user
                     for (workout in cloudWorkoutsList.takeLast(5).reversed()) {
                         val historyCard = MaterialCardView(this@ProgressActivity).apply {
                             layoutParams = LinearLayout.LayoutParams(
@@ -96,11 +114,12 @@ class ProgressActivity : BaseActivity() {
                     }
                 } else {
                     cvNoCloudHistory.visibility = View.VISIBLE
-                    tvCloudHistoryStatus.text = "Connected to Firebase! No cloud entries stored yet."
+                    tvCloudHistoryStatus.text = "No cloud entries for your account yet."
                 }
             } catch (e: Exception) {
+                Log.e(TAG, "Failed to fetch cloud history", e)
                 cvNoCloudHistory.visibility = View.VISIBLE
-                tvCloudHistoryStatus.text = "Error: ${e.localizedMessage ?: "Connection failure"}. Check Firebase Rules tab or internet."
+                tvCloudHistoryStatus.text = "Cloud feed unavailable. Check connection."
             }
         }
     }
@@ -118,7 +137,7 @@ class ProgressActivity : BaseActivity() {
             findViewById<TextView>(R.id.tvWorkoutsThisWeek).text = if (workoutsThisWeek == 1) "1 Session" else "$workoutsThisWeek Sessions"
             findViewById<TextView>(R.id.tvStreakBadge).text = "$streak Days"
 
-            // Extract metrics for the Regression Line Stats Chart - completely zero-based initialization
+            // Extract metrics for the Regression Line Stats Chart
             val chartView = findViewById<StatsChartView>(R.id.statsChartView)
             val realVolumePoints = mutableListOf<Float>()
 
@@ -135,24 +154,18 @@ class ProgressActivity : BaseActivity() {
                     }
                 }
             }
-            // Populate the chart view with live computed metrics (will display safe empty/zero helper text if empty)
             chartView.setData(realVolumePoints)
 
-            // Update Saved Plans section to tell users where generated plans can be reused
-            val llSavedPlansContainer = findViewById<LinearLayout>(R.id.llSavedPlansContainer)
-            val tvNoSavedPlans = findViewById<TextView>(R.id.tvNoSavedPlans)
-            
-            // Show the newly generated or active plan in the dashboard list
-            tvNoSavedPlans.text = "Your generated home plan is saved and active! You can reuse it anytime or generate a new one right from the 'Plan Generator' button on the Home screen."
+            // Saved Plans Helper
+            findViewById<TextView>(R.id.tvNoSavedPlans).text = "Your generated plans are active! Reuse them anytime from the Home screen."
 
-            // Update History List with premium Material cards
+            // Update History List
             val llHistoryContainer = findViewById<LinearLayout>(R.id.llHistoryContainer)
             val cvNoHistory = findViewById<MaterialCardView>(R.id.cvNoHistory)
 
             if (historyLog.trim().isNotEmpty()) {
                 cvNoHistory.visibility = View.GONE
                 
-                // Clear previous entries while preserving the empty-state template
                 for (i in llHistoryContainer.childCount - 1 downTo 0) {
                     val child = llHistoryContainer.getChildAt(i)
                     if (child.id != R.id.cvNoHistory) {
@@ -171,7 +184,6 @@ class ProgressActivity : BaseActivity() {
                         val timestamp = parts[2].toLongOrNull() ?: 0L
                         val date = if (timestamp > 0) Date(timestamp) else Date()
                         
-                        // Create modern Material Card
                         val historyCard = MaterialCardView(this).apply {
                             layoutParams = LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -203,51 +215,42 @@ class ProgressActivity : BaseActivity() {
                         })
 
                         historyCard.addView(innerLayout)
-                        llHistoryContainer.addView(historyCard, 0) // Reverse order for feed feel
+                        llHistoryContainer.addView(historyCard)
                     }
                 }
             } else {
                 cvNoHistory.visibility = View.VISIBLE
             }
             
-            // PR Logic - Horizontal scroller for records
+            // PR Logic
             val llPRContainer = findViewById<LinearLayout>(R.id.llPRContainer)
             val tvNoPRs = findViewById<TextView>(R.id.tvNoPRs)
-            
             val commonExercises = listOf("Push-ups", "Plank", "Squats", "Dumbbell Rows", "Bench Press")
             var hasPRs = false
             
             llPRContainer.removeAllViews()
-            
             for (ex in commonExercises) {
                 val pr = sharedPreferences.getFloat("user_pr_$ex", 0f)
                 if (pr > 0) {
                     hasPRs = true
-                    
                     val prCard = MaterialCardView(this).apply {
-                        layoutParams = LinearLayout.LayoutParams(
-                            380,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        ).apply { setMargins(0, 0, 16, 8) }
+                        layoutParams = LinearLayout.LayoutParams(380, LinearLayout.LayoutParams.WRAP_CONTENT).apply { setMargins(0, 0, 16, 8) }
                         radius = 16f * resources.displayMetrics.density
                         cardElevation = 4f
                         setCardBackgroundColor(getColorStateList(R.color.app_surface))
                         strokeWidth = 0
                     }
-
                     val prLayout = LinearLayout(this).apply {
                         orientation = LinearLayout.VERTICAL
                         setPadding(32, 32, 32, 32)
                         gravity = Gravity.CENTER
                     }
-
                     prLayout.addView(TextView(this).apply {
                         text = ex
                         setTextColor(getColor(R.color.text_secondary))
                         textSize = 11f
                         gravity = Gravity.CENTER
                     })
-
                     prLayout.addView(TextView(this).apply {
                         text = if (ex == "Plank") "${pr.toInt()}s" else "${pr.toInt()}kg"
                         setTextColor(getColor(R.color.orange_primary))
@@ -256,19 +259,12 @@ class ProgressActivity : BaseActivity() {
                         gravity = Gravity.CENTER
                         setPadding(0, 4, 0, 0)
                     })
-
                     prCard.addView(prLayout)
                     llPRContainer.addView(prCard)
                 }
             }
-            
-            if (hasPRs) {
-                tvNoPRs.visibility = View.GONE
-                llPRContainer.visibility = View.VISIBLE
-            } else {
-                tvNoPRs.visibility = View.VISIBLE
-                llPRContainer.visibility = View.GONE
-            }
+            tvNoPRs.visibility = if (hasPRs) View.GONE else View.VISIBLE
+            llPRContainer.visibility = if (hasPRs) View.VISIBLE else View.GONE
         }
     }
 }

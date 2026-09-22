@@ -1,8 +1,8 @@
 # RepSync – Hybrid Offline-First Fitness Companion
 
-RepSync is an Android fitness application developed using Kotlin. The application is designed to help users plan, manage, record, and monitor their workouts in one place.
+RepSync is a modern Android fitness application developed using Kotlin, designed to help users plan, track, and analyze their workouts in one unified platform. The app is built with a focus on reliability, data security, and seamless synchronization, ensuring users can maintain their fitness journey regardless of network availability.
 
-RepSync follows a **hybrid offline-first architecture**, allowing users to access and manage locally stored information even when there is no internet connection. When connectivity is available, data can be synchronised with Firebase through a REST API.
+RepSync follows a **hybrid offline-first architecture**, allowing users to access and manage information locally even without an internet connection. When connectivity is available, data is automatically synchronised with the cloud through secure REST API integrations.
 
 ---
 
@@ -17,48 +17,40 @@ RepSync follows a **hybrid offline-first architecture**, allowing users to acces
 
 ## 📱 About RepSync
 
-RepSync provides users with a simple fitness companion for managing their training activities and monitoring their progress. The application focuses on workout planning, exercise information, tracking, and progress analytics. It is designed to remain fully functional in environments where an internet connection may not always be available.
+RepSync provides a comprehensive fitness companion for managing training activities and monitoring progress. The application focuses on workout planning, exercise information, live tracking, and advanced progress analytics. It is designed to remain fully functional in environments where an internet connection may not always be available.
 
 ---
 
 ## ✨ Features
 
-### 🔐 User Authentication
-- Secure Sign Up and Sign In.
-- Password hashing using **BCrypt** for data protection.
-- Local user storage (Room DB) with Firebase cloud backup.
-- Offline access to account information.
+### 🔐 User Authentication & Smart Validation
+- **Secure Access:** Sign Up and Sign In screens with robust input validation to prevent user errors.
+- **Strict Input Rules:** The name field is restricted to alphabetic characters (letters and spaces only), and the email field requires a proper format (e.g., user@gmail.com) to ensure data integrity.
+- **Data Security:** Implements **BCrypt cryptographic hashing** for all user passwords, ensuring that credentials are never stored in plain text.
+- **Hybrid Storage:** Local user storage (Room DB) with instant Firebase cloud backup for seamless cross-device synchronization.
 
-### 👤 User Profile
-- Overview of total workouts, streaks, and training volume.
-- Tracking of personal records and fitness progress.
+### 👤 User Profile & Settings
+- **Activity Summary:** Overview of total workouts, streaks, and training volume milestone tracking.
+- **Theme Customization:** Functional native **Dark & Light Mode** toggle found in the Profile/Settings menu. User preferences are saved locally using `SharedPreferences` and persist across application restarts.
 
-### 🌙 Dark & Light Mode
-- Functional native theme toggle.
-- Selection is saved locally using `SharedPreferences`.
+### 🏋️ Feature 1: Smart Workout Plan Generator
+- Generates structured routines based on muscle splits (Push, Pull, Legs).
+- Allows users to customize routines based on their training environment and specific muscle group focus.
 
-### 🏋️ Workout Plan Generator
-- Create routines based on muscle splits (Push, Pull, Legs).
-- Customizable muscle group selection.
+### 📚 Feature 2: High-Fidelity Exercise Library
+- A comprehensive reference catalog with step-by-step instructions.
+- Provides target muscle information (Primary/Secondary) and training tips for every exercise.
 
-### 📚 Exercise Library
-- Reference catalog with instructions, target muscles, and tips.
-- Accessible directly within the application.
-
-### ⏱️ Workout Tracker
-- Record exercises, sets, reps, and weight.
-- Live session timer for monitoring duration.
-- Automatic volume calculation.
-
-### 📊 Progress Analytics
-- Visual statistics and training trends.
-- Custom `StatsChartView` for data visualization using regression trends.
+### ⏱️ Feature 3: Workout Tracker & Analytics
+- **Live Logging:** Record exercises, sets, reps, and weight in real-time with an active session timer.
+- **Data Visualization:** Custom `StatsChartView` for rendering training volume trends using linear regression algorithms.
+- **Personal Records:** Automatic identification and storage of PRs for every movement.
 
 ---
 
 ## 🏗️ Application Architecture
 
-RepSync uses a hybrid **offline-first architecture**.
+RepSync uses a hybrid **offline-first architecture** to ensure stability and performance.
 
 ```text
                     ┌──────────────────────┐
@@ -70,16 +62,26 @@ RepSync uses a hybrid **offline-first architecture**.
                 │                             │
         ┌───────▼────────┐           ┌────────▼─────────┐
         │  Room Database │           │   Retrofit REST  │
-        │     SQLite     │           │       API        │
+        │     SQLite     │           │       APIs       │
         └───────┬────────┘           └────────┬─────────┘
                 │                             │
-                │                    ┌────────▼─────────┐
-                │                    │ Firebase Realtime│
-                │                    │     Database     │
-                │                    └──────────────────┘
+                │                    ┌────────┴─────────┐
+                │             ┌──────▼──────┐    ┌──────▼──────┐
+                │             │  Firebase   │    │ Public Tip  │
+                │             │  Cloud API  │    │  Advice API │
+                │             └─────────────┘    └─────────────┘
                 │
                 └──── Local / Offline Storage
 ```
+
+---
+
+## 🌐 Dual REST API Integration
+
+RepSync utilizes two distinct REST API integrations via **Retrofit2** to handle different data requirements:
+
+1.  **Cloud Sync API (`WorkoutApiService`):** A private REST integration with **Firebase Realtime Database** used for synchronizing user profiles and workout history across devices.
+2.  **Public Advice API (`FitnessApiService`):** A third-party integration with `api.adviceslip.com` used to fetch and display live fitness motivation and daily tips on the dashboard.
 
 ---
 
@@ -87,35 +89,43 @@ RepSync uses a hybrid **offline-first architecture**.
 
 | Technology | Purpose |
 | :--- | :--- |
-| Kotlin | Main programming language |
-| Android Studio | IDE for development |
-| Room Database | Local data storage (SQLite) |
-| Retrofit2 | REST API communication |
-| Gson | JSON conversion |
-| Firebase | Cloud storage and backup |
-| BCrypt | Secure password hashing |
-| Coroutines | Asynchronous operations |
+| **Kotlin** | Main programming language |
+| **Room Database** | Local data storage (SQLite) |
+| **Retrofit2** | Dual REST API communication |
+| **Gson** | JSON conversion & mapping |
+| **Firebase** | Cloud storage and backup |
+| **BCrypt** | Secure password hashing |
+| **Coroutines** | Asynchronous operations |
 
 ---
 
-## 🌐 REST API & Data Storage
+## 🧪 Quality Assurance & Automated Testing
 
-RepSync uses **Retrofit2** to communicate with the **Firebase Realtime Database** through its REST API. Data is handled as JSON and mapped to Kotlin objects using **Gson**.
-
-- **Local Storage:** Room provides the primary data layer for users and workouts, ensuring offline availability.
-- **Cloud Storage:** Firebase serves as the remote backup and synchronization point when the device is online.
+The project includes a suite of **Automated Unit Tests** to verify core logic and maintain code quality:
+- **Validation Testing:** `ValidationUnitTest.kt` ensures the app correctly handles name formatting (letters only) and email validation format.
+- **Authentication Logic:** `AuthUnitTest.kt` verifies that the authentication and password hashing loops are functioning as intended.
 
 ---
 
 ## 🔒 Security
 
-We implement **BCrypt/JBCrypt** hashing for all user passwords to ensure they are never stored in plain text. The architecture ensures sensitive data is cached securely on the device and synchronized only over encrypted HTTPS connections.
+We implement **BCrypt/JBCrypt** hashing for all user passwords to ensure they are never stored in plain text. The architecture ensures sensitive data is cached securely on the device and synchronized only over encrypted HTTPS connections via Retrofit.
 
 ---
 
 ## 🧪 Offline-First Behaviour
 
-RepSync is designed to be resilient. When offline, previously stored local data remains accessible, new workouts can be recorded, and network requests fail gracefully without causing crashes. Data synchronizes automatically once a connection is re-established.
+RepSync is designed to be resilient. When offline:
+- Previously stored local data remains accessible.
+- New workouts can be recorded and saved to the local database.
+- Network requests fail gracefully without causing application crashes.
+- Data synchronizes automatically once a connection is re-established.
+
+---
+
+## 📌 Project Status
+
+**Status:** Completed
 
 ---
 
@@ -124,15 +134,13 @@ RepSync is designed to be resilient. When offline, previously stored local data 
 ### Requirements
 - Android Studio
 - Android SDK (API 24+)
-- Kotlin
-- A Firebase project configuration
+- A Firebase project configuration (Database URL)
 
 ### Installation
-1. Clone the repository: `git clone [YOUR GITHUB REPOSITORY LINK]`
-2. Open the project in Android Studio.
-3. Synchronise the Gradle dependencies.
-4. Add your `google-services.json` or configure the API URL in `WorkoutApiService`.
-5. Run the application on an emulator or device.
+1. Clone the repository.
+2. Open the project in Android Studio and sync Gradle.
+3. Configure your Firebase project and update `WorkoutApiService.kt` with your database URL.
+4. Run the application on an emulator or physical device.
 
 ---
 

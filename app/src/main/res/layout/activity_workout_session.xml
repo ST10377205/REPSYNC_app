@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.github.com/tools"
@@ -9,11 +9,14 @@
     android:background="@color/app_background"
     tools:context=".WorkoutSessionActivity">
 
+    <!-- Header Toolbar with a FINISH button at the top too -->
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        app:elevation="0dp">
+        app:elevation="0dp"
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -48,7 +51,7 @@
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/tvFinishWorkout"
+                android:id="@+id/btnToolbarFinish"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -60,18 +63,20 @@
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Scrollable Exercises -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+        app:layout_constraintBottom_toTopOf="@id/bottomActionContainer">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:paddingBottom="100dp">
+            android:padding="16dp">
 
             <LinearLayout
                 android:id="@+id/llExerciseContainer"
@@ -88,46 +93,33 @@
                 android:textColor="@color/text_primary"
                 app:cornerRadius="16dp"
                 app:strokeColor="@color/app_surface_variant"
-                android:layout_marginTop="8dp" />
-
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="32dp"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Floating Timer/Control Pill (Optional Visual) -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cvSessionControls"
-        android:layout_width="wrap_content"
+    <!-- FIXED BOTTOM FINISH BUTTON -->
+    <LinearLayout
+        android:id="@+id/bottomActionContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="24dp"
-        app:cardCornerRadius="28dp"
-        app:cardElevation="6dp"
-        app:cardBackgroundColor="@color/app_surface">
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/app_surface"
+        android:elevation="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="12dp"
-            android:gravity="center">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tvFinishWorkout"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="COMPLETE SESSION"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/orange_primary"
+            app:cornerRadius="16dp"
+            app:elevation="8dp" />
+    </LinearLayout>
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_timer"
-                app:tint="@color/text_secondary" />
-
-            <TextView
-                android:id="@+id/tvControlTimer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00:00"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginStart="8dp"/>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
