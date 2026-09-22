@@ -116,5 +116,5 @@ RepSync is designed to be resilient. When offline:
 
 ## 🔗 GITHUB AND YOUTUBE Links
 
-- **GitHub Repository:** [PASTE YOUR GITHUB LINK HERE]
+- **GitHub Repository:** https://github.com/ST10377205/REPSYNC_app 
 - **YouTube Demonstration Video:** [PASTE YOUR UNLISTED YOUTUBE VIDEO LINK HERE]
