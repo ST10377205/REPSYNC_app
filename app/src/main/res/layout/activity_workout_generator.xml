@@ -21,7 +21,7 @@
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_chevron_left"
             app:navigationIconTint="@color/text_primary"
-            app:title="Plan Generator"
+            app:title="@string/ui_plan_generator"
             app:titleTextColor="@color/text_primary"
             app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -40,7 +40,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Customized for you"
+                android:text="@string/ui_customized_for_you"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:layout_gravity="center_horizontal"
@@ -50,7 +50,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Training Goal"
+                android:text="@string/ui_training_goal"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -78,7 +78,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Build Muscle"
+                        android:text="@string/ui_build_muscle"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -93,7 +93,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Available Equipment"
+                android:text="@string/ui_available_equipment"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -121,7 +121,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Home (No Equipment)"
+                        android:text="@string/ui_home_no_equipment"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -136,7 +136,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Frequency"
+                android:text="@string/ui_frequency"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -164,7 +164,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="3 Days / Week"
+                        android:text="@string/ui_3_days_week"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -180,7 +180,7 @@
                 android:id="@+id/btnGenerateWorkout"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
-                android:text="GENERATE HOME PLAN"
+                android:text="@string/ui_generate_home_plan"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:cornerRadius="16dp"

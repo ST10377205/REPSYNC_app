@@ -5,25 +5,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.activity.addCallback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.concurrent.TimeUnit
+import java.util.Locale
 
-/**
- * WorkoutSessionActivity - Manages the active training session.
- * Features a live timer and dynamic set tracking.
- */
 class WorkoutSessionActivity : BaseActivity() {
-    private val TAG = "WorkoutSession"
+    private var sessionOwnerId: Int = -1
     private lateinit var llExerciseContainer: LinearLayout
     private var exerciseList = ArrayList<String>()
     private var categoryList = ArrayList<String>()
@@ -35,17 +29,16 @@ class WorkoutSessionActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sessionOwnerId = savedInstanceState?.getInt("session_owner_id")
+            ?: getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE).getInt("current_user_id", -1)
         setContentView(R.layout.activity_workout_session)
-        Log.d(TAG, "onCreate: Session started")
 
         llExerciseContainer = findViewById(R.id.llExerciseContainer)
 
-        // Handle System Insets (Status bar and Navigation bar)
-        // Fixed: Added bottom inset padding to ensure the "Finish" button isn't hidden behind the phone's navigation buttons
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.workoutSessionMain)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
-            insets
+        applySystemBarInsets(R.id.workoutSessionMain)
+        onBackPressedDispatcher.addCallback(this) { showExitConfirmation() }
+        setupToolbarNavigation(contentDescriptionRes = R.string.exit_workout) {
+            onBackPressedDispatcher.onBackPressed()
         }
 
         loadExercisesFromIntent()
@@ -70,15 +63,14 @@ class WorkoutSessionActivity : BaseActivity() {
             exerciseList.addAll(listOf("Child's Pose", "Downward Dog", "Cobra Stretch", "Cat-Cow", "Warrior II"))
             categoryList.addAll(List(5) { "Flexibility • Yoga" })
         } else {
+            // Default Home Workout
             exerciseList.addAll(listOf("Push-ups", "Air Squats", "Burpees", "Mountain Climbers"))
             categoryList.addAll(List(4) { "Home • Bodyweight" })
         }
     }
 
     private fun setupUI() {
-        val btnFinish = findViewById<MaterialButton>(R.id.tvFinishWorkout)
-        btnFinish.setOnClickListener {
-            Log.d(TAG, "Finish button clicked")
+        findViewById<MaterialButton>(R.id.tvFinishWorkout).setOnClickListener {
             showFinishConfirmation()
         }
 
@@ -86,8 +78,7 @@ class WorkoutSessionActivity : BaseActivity() {
             startActivity(Intent(this, ExerciseLibraryActivity::class.java))
         }
 
-        val routineTitle = intent.getStringExtra("ROUTINE_TITLE") ?: "Home Workout"
-        findViewById<TextView>(R.id.tvRoutineTitle).text = routineTitle
+        findViewById<TextView>(R.id.tvRoutineTitle).text = localizedText(intent.getStringExtra("ROUTINE_TITLE") ?: "Home Workout")
         
         setupExerciseViews()
     }
@@ -96,9 +87,13 @@ class WorkoutSessionActivity : BaseActivity() {
         timerRunnable = object : Runnable {
             override fun run() {
                 secondsElapsed++
+                val hours = secondsElapsed / 3600
                 val minutes = (secondsElapsed % 3600) / 60
                 val secs = secondsElapsed % 60
-                findViewById<TextView>(R.id.tvTimer).text = String.format("%02d:%02d", minutes, secs)
+                val timeString = String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, secs)
+                findViewById<TextView>(R.id.tvTimer).text =
+                    String.format(Locale.getDefault(), "%02d:%02d", minutes, secs)
+                findViewById<TextView>(R.id.tvControlTimer).text = timeString
                 handler.postDelayed(this, 1000)
             }
         }
@@ -107,23 +102,36 @@ class WorkoutSessionActivity : BaseActivity() {
 
     private fun showFinishConfirmation() {
         MaterialAlertDialogBuilder(this)
-            .setTitle("Finish Workout?")
-            .setMessage("Are you sure you want to save your progress and complete the session?")
-            .setPositiveButton("Finish") { _, _ ->
-                Log.d(TAG, "User confirmed finish")
+            .setTitle(getString(R.string.ui_finish_workout))
+            .setMessage(getString(R.string.ui_are_you_sure_you_want_to_complete_your_session))
+            .setPositiveButton(getString(R.string.ui_finish_4)) { _, _ ->
                 finishAndSave()
             }
-            .setNegativeButton("Keep Going", null)
+            .setNegativeButton(getString(R.string.ui_cancel), null)
+            .show()
+    }
+
+    private fun showExitConfirmation() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.ui_exit_workout))
+            .setMessage(getString(R.string.ui_your_progress_in_this_session_will_be_lost))
+            .setPositiveButton(getString(R.string.ui_exit)) { _, _ -> finish() }
+            .setNegativeButton(getString(R.string.ui_keep_training), null)
             .show()
     }
 
     private fun finishAndSave() {
-        Log.d(TAG, "Executing finishAndSave process")
-        saveWorkoutData()
-        val routineTitle = findViewById<TextView>(R.id.tvRoutineTitle).text.toString()
+        val result = collectWorkoutResult()
         val intent = Intent(this, WorkoutSummaryActivity::class.java).apply {
+            putExtra("WORKOUT_OWNER_ID", sessionOwnerId)
+            putExtra("WORKOUT_ID", java.util.UUID.randomUUID().toString())
             putExtra("SESSION_TIME_SECONDS", secondsElapsed)
-            putExtra("ROUTINE_TITLE", routineTitle)
+            putExtra("ROUTINE_TITLE", intent.getStringExtra("ROUTINE_TITLE") ?: "Home Workout")
+            putExtra("TOTAL_VOLUME", result.totalVolume)
+            putExtra("COMPLETED_SETS", result.completedSets)
+            putExtra("PERSONAL_RECORDS", result.personalRecords)
+            putStringArrayListExtra("PR_EXERCISES", ArrayList(result.prExercises))
+            putExtra("PR_WEIGHTS", result.prWeights.toFloatArray())
         }
         startActivity(intent)
         finish()
@@ -136,19 +144,20 @@ class WorkoutSessionActivity : BaseActivity() {
 
         for (i in exerciseList.indices) {
             val exerciseView = inflater.inflate(R.layout.item_workout_exercise, llExerciseContainer, false)
-            exerciseView.findViewById<TextView>(R.id.tvExerciseName).text = exerciseList[i]
-            exerciseView.findViewById<TextView>(R.id.tvExerciseCategory).text = categoryList[i]
+            exerciseView.findViewById<TextView>(R.id.tvExerciseName).text = localizedText(exerciseList[i])
+            exerciseView.findViewById<TextView>(R.id.tvExerciseCategory).text = localizedText(categoryList[i])
 
             val container = exerciseView.findViewById<LinearLayout>(R.id.llSetsContainer)
             val btnAdd = exerciseView.findViewById<MaterialButton>(R.id.btnAddSet)
 
-            addSetRow(container, inflater)
+            addSetRow(container, inflater) // Initial set
 
             btnAdd.setOnClickListener {
                 addSetRow(container, inflater)
             }
 
             llExerciseContainer.addView(exerciseView)
+            exerciseView.tag = exerciseList[i]
             exerciseViews.add(exerciseView)
         }
     }
@@ -164,86 +173,55 @@ class WorkoutSessionActivity : BaseActivity() {
         container.addView(setView)
     }
 
-    private fun saveWorkoutData() {
+    private fun collectWorkoutResult(): WorkoutResult {
         val sharedPreferences = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE)
-        val userId = sharedPreferences.getInt("current_user_id", -1)
-        
-        if (userId != -1) {
-            Log.d(TAG, "Saving workout data for user: $userId")
-            val editor = sharedPreferences.edit()
-            var totalVolume = 0f
-            
-            for (view in exerciseViews) {
-                val name = view.findViewById<TextView>(R.id.tvExerciseName).text.toString()
-                val setsContainer = view.findViewById<LinearLayout>(R.id.llSetsContainer)
-                var maxWeight = 0f
-                
-                for (i in 0 until setsContainer.childCount) {
-                    val row = setsContainer.getChildAt(i)
-                    val weightStr = row.findViewById<EditText>(R.id.etWeight).text.toString()
-                    val repsStr = row.findViewById<EditText>(R.id.etReps).text.toString()
-                    
-                    val weight = weightStr.toFloatOrNull() ?: 0f
-                    val reps = repsStr.toIntOrNull() ?: 0
-                    
-                    if (row.findViewById<CheckBox>(R.id.cbDone).isChecked) {
-                        totalVolume += (weight * reps)
-                        if (weight > maxWeight) maxWeight = weight
-                    }
-                }
-                
-                if (maxWeight > 0) {
-                    val pr = sharedPreferences.getFloat("user_pr_$name", 0f)
-                    if (maxWeight > pr) {
-                        Log.i(TAG, "New PR for $name: $maxWeight")
-                        editor.putFloat("user_pr_$name", maxWeight)
-                    }
+        var totalVolume = 0f
+        var completedSets = 0
+        val prExercises = mutableListOf<String>()
+        val prWeights = mutableListOf<Float>()
+
+        for (view in exerciseViews) {
+            val name = view.tag as String
+            val setsContainer = view.findViewById<LinearLayout>(R.id.llSetsContainer)
+            var maxWeight = 0f
+
+            for (i in 0 until setsContainer.childCount) {
+                val row = setsContainer.getChildAt(i)
+                if (row.findViewById<CheckBox>(R.id.cbDone).isChecked) {
+                    val weight = row.findViewById<EditText>(R.id.etWeight).text.toString().toFloatOrNull() ?: 0f
+                    val reps = row.findViewById<EditText>(R.id.etReps).text.toString().toIntOrNull() ?: 0
+                    completedSets++
+                    totalVolume += weight * reps
+                    if (weight > maxWeight) maxWeight = weight
                 }
             }
 
-            val history = sharedPreferences.getString("user_history_$userId", "") ?: ""
-            val title = findViewById<TextView>(R.id.tvRoutineTitle).text.toString()
-            val now = System.currentTimeMillis()
-            val newRecord = "$title • ${totalVolume.toInt()} kg • $now\n"
-            editor.putString("user_history_$userId", history + newRecord)
-
-            // Update stats: Workouts this week
-            val workoutsThisWeek = sharedPreferences.getInt("user_workouts_this_week_$userId", 0)
-            editor.putInt("user_workouts_this_week_$userId", workoutsThisWeek + 1)
-
-            // Update stats: Streak logic
-            val lastWorkoutTime = sharedPreferences.getLong("user_last_workout_time_$userId", 0L)
-            var currentStreak = sharedPreferences.getInt("user_streak_$userId", 0)
-
-            if (lastWorkoutTime == 0L) {
-                // First session ever starts the streak at 1
-                currentStreak = 1
-            } else {
-                val lastDay = TimeUnit.MILLISECONDS.toDays(lastWorkoutTime)
-                val today = TimeUnit.MILLISECONDS.toDays(now)
-
-                if (today == lastDay + 1) {
-                    // Consecutive day
-                    currentStreak += 1
-                } else if (today > lastDay) {
-                    // Streak broken (missed at least one day)
-                    currentStreak = 1
-                }
-                // If today == lastDay, currentStreak remains the same
+            if (maxWeight > sharedPreferences.getFloat("user_pr_$name", 0f)) {
+                prExercises.add(name)
+                prWeights.add(maxWeight)
             }
-            
-            editor.putInt("user_streak_$userId", currentStreak)
-            editor.putLong("user_last_workout_time_$userId", now)
-
-            editor.apply()
-            Log.d(TAG, "Local storage updated: Streak=$currentStreak, Weekly Count=${workoutsThisWeek + 1}")
-        } else {
-            Log.e(TAG, "Failed to save: User not logged in")
         }
+
+        return WorkoutResult(totalVolume, completedSets, prExercises, prWeights)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt("session_owner_id", sessionOwnerId)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(timerRunnable)
+    }
+
+    private data class WorkoutResult(
+        val totalVolume: Float,
+        val completedSets: Int,
+        val prExercises: List<String>,
+        val prWeights: List<Float>
+    ) {
+        val personalRecords: Int
+            get() = prExercises.size
     }
 }

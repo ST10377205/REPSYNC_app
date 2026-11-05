@@ -3,13 +3,13 @@ package com.example.myapplication
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 
@@ -18,23 +18,39 @@ class ProfileActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        // Handle system bar insets for Edge-to-Edge look
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.profileMain)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-            insets
+        applySystemBarInsets(R.id.profileMain)
+        setupToolbarNavigation()
+        findViewById<View>(R.id.btnNotifications).setOnClickListener {
+            startActivity(Intent(this, NotificationsActivity::class.java))
         }
-
-        setupToolbar()
+        findViewById<View>(R.id.btnWorkoutSync).setOnClickListener {
+            startActivity(Intent(this, WorkoutSyncActivity::class.java))
+        }
+        setupLanguagePicker()
         setupThemeSwitch()
         setupLogout()
         setupBottomNavigation(R.id.nav_profile)
         loadUserData()
     }
 
-    private fun setupToolbar() {
-        findViewById<MaterialToolbar>(R.id.toolbar).setNavigationOnClickListener {
-            finish()
+    private fun setupLanguagePicker() {
+        val codes = arrayOf("en", "zu", "af")
+        val names = arrayOf("English", "isiZulu", "Afrikaans")
+        val current = AppCompatDelegate.getApplicationLocales()[0]?.language
+            ?: resources.configuration.locales[0].language
+        val selected = codes.indexOf(current).coerceAtLeast(0)
+        findViewById<TextView>(R.id.tvLanguageValue).text = names[selected]
+        findViewById<View>(R.id.btnLanguage).apply {
+            setOnClickListener {
+                MaterialAlertDialogBuilder(this@ProfileActivity)
+                    .setTitle(R.string.choose_language)
+                    .setSingleChoiceItems(names, selected) { dialog, which ->
+                        dialog.dismiss()
+                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(codes[which]))
+                    }
+                    .setNegativeButton(R.string.ui_cancel, null)
+                    .show()
+            }
         }
     }
 
@@ -64,6 +80,7 @@ class ProfileActivity : BaseActivity() {
         
         val isDarkMode = sharedPreferences.getBoolean("dark_mode", true)
         switchTheme.isChecked = isDarkMode
+        findViewById<View>(R.id.rowTheme).setOnClickListener { switchTheme.toggle() }
 
         switchTheme.setOnCheckedChangeListener { _, isChecked ->
             if (sharedPreferences.getBoolean("dark_mode", true) != isChecked) {
@@ -77,13 +94,15 @@ class ProfileActivity : BaseActivity() {
 
     private fun setupLogout() {
         findViewById<MaterialButton>(R.id.btnLogout).setOnClickListener {
-            val sharedPreferences = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().remove("current_user_id").apply()
-            
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+            findViewById<MaterialButton>(R.id.btnLogout).isEnabled = false
+            AuthSession.clearLocalSession(this)
+            lifecycleScope.launch {
+                AuthSession.clearGoogleSession(this@ProfileActivity)
+                val intent = Intent(this@ProfileActivity, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            }
         }
     }
 }

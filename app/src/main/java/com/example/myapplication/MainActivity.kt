@@ -6,27 +6,25 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 
 class MainActivity : BaseActivity() {
+    private var workoutObserver: Job? = null
+    private var exerciseRequest: Job? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, 0)
-            insets
-        }
+
+        applySystemBarInsets(R.id.main)
 
         setupButtons()
         setupBottomNavigation(R.id.nav_home)
         loadUserData()
-        fetchDailyTip()
+        fetchExerciseSpotlight()
     }
 
     private fun setupButtons() {
@@ -62,15 +60,36 @@ class MainActivity : BaseActivity() {
             })
         }
 
-        // Action listener for refreshing tips instantly via REST API
+        // Refresh the fitness database spotlight.
         findViewById<MaterialCardView>(R.id.btnRefreshTips).setOnClickListener {
-            fetchDailyTip()
+            fetchExerciseSpotlight(refresh = true)
         }
     }
 
     override fun onResume() {
         super.onResume()
+        observeWorkoutChanges()
         loadUserData()
+    }
+
+
+    override fun onPause() {
+        workoutObserver?.cancel()
+        super.onPause()
+    }
+
+    private fun observeWorkoutChanges() {
+        workoutObserver?.cancel()
+        val userId = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE).getInt("current_user_id", -1)
+        if (userId < 0) return
+        workoutObserver = lifecycleScope.launch {
+            val repository = WorkoutRepository(this@MainActivity)
+            repository.ensureLegacyImported(userId)
+            repository.observe(userId).collect {
+                repository.refreshMetrics(userId)
+                loadUserData()
+            }
+        }
     }
 
     private fun loadUserData() {
@@ -94,29 +113,32 @@ class MainActivity : BaseActivity() {
             findViewById<TextView>(R.id.tvStreak).text = streak.toString()
             findViewById<TextView>(R.id.tvThisWeek).text = workoutsThisWeek.toString()
             findViewById<TextView>(R.id.tvDuration).text = "${totalDuration}m"
-            
+
             findViewById<ProgressBar>(R.id.pbPushDayProgress).progress = progress
             findViewById<TextView>(R.id.tvPushDayPercent).text = "$progress%"
-            
-            findViewById<TextView>(R.id.tvWeeklySubtext).text = if (workoutsThisWeek > 0) 
-                "You've crushed $workoutsThisWeek sessions this week!" 
-                else "Ready for your first session of the week?"
+
+            findViewById<TextView>(R.id.tvWeeklySubtext).text = if (workoutsThisWeek > 0)
+                getString(R.string.weekly_sessions, workoutsThisWeek)
+                else getString(R.string.first_session)
         }
     }
 
-    private fun fetchDailyTip() {
-        val tvDailyTip = findViewById<TextView>(R.id.tvDailyTip)
-        tvDailyTip.text = "Loading fresh advice..."
-        
-        // Connect the active Retrofit service to load real-time tips from the live REST API
-        lifecycleScope.launch {
+    private fun fetchExerciseSpotlight(refresh: Boolean = false) {
+        exerciseRequest?.cancel()
+        val text = findViewById<TextView>(R.id.tvDailyTip)
+        text.text = getString(R.string.online_loading)
+        text.setOnClickListener { startActivity(Intent(this, OnlineExercisesActivity::class.java)) }
+        exerciseRequest = lifecycleScope.launch {
             try {
-                val apiService = FitnessApiService.create()
-                val response = apiService.getDailyTip()
-                tvDailyTip.text = "\"${response.slip.advice}\""
-            } catch (e: Exception) {
-                // Fallback elegant message if offline
-                tvDailyTip.text = "\"Consistency is the secret ingredient to seeing results at home.\""
+                val page = OnlineExerciseRepository(this@MainActivity).loadPage(refresh = refresh)
+                val exercise = page.exercises.randomOrNull()
+                text.text = if (exercise == null) getString(R.string.online_open)
+                    else getString(R.string.online_preview, exercise.name, exercise.category) +
+                        "\n" + getString(if (page.saved) R.string.online_preview_saved else R.string.online_preview_live)
+            } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                text.text = getString(R.string.online_open)
             }
         }
     }

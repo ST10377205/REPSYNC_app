@@ -13,3 +13,30 @@
 .externalNativeBuild
 .cxx
 local.properties
+*.jks
+*.keystore
+*.p12
+*.password.dpapi
+/keystore.properties
+/release-signing/
+/play-store/release/
+/play-store/screenshots/raw/
+
+# Local IDE files and generated outputs
+/.idea/
+/.kotlin/
+*.apk
+*.aab
+*.apks
+# Local cloud configuration, credentials and private assignment evidence
+/app/google-services*.json
+**/*service-account*.json
+**/*serviceAccount*.json
+**/*firebase-adminsdk*.json
+.env
+.env.*
+/play-store/Play-Console-Registration-Evidence/
+
+# Backend dependencies and private Firebase Admin keys
+node_modules/
+**/serviceAccountKey.json

@@ -31,7 +31,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Welcome back,"
+                    android:text="@string/ui_welcome_back"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp" />
 
@@ -39,7 +39,7 @@
                     android:id="@+id/tvUserName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Athlete"
+                    android:text="@string/ui_athlete"
                     android:textColor="@color/text_primary"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -111,7 +111,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="READY FOR A SESSION?"
+                        android:text="@string/ui_ready_for_a_session"
                         android:textColor="@color/white"
                         android:textSize="12sp"
                         android:textStyle="bold"
@@ -120,7 +120,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Home Full Body"
+                        android:text="@string/ui_home_full_body"
                         android:textColor="@color/white"
                         android:textSize="24sp"
                         android:textStyle="bold"
@@ -129,7 +129,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="35 min • Equipment-free"
+                        android:text="@string/ui_35_min_equipment_free"
                         android:textColor="@color/white"
                         android:textSize="14sp"
                         android:alpha="0.9"
@@ -140,7 +140,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:text="START NOW"
+                        android:text="@string/ui_start_now"
                         android:textColor="@color/orange_primary"
                         app:backgroundTint="@color/white"
                         app:cornerRadius="12dp" />
@@ -162,8 +162,8 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
-                    <TextView android:id="@+id/tvStreak" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Streak" android:textColor="@color/text_secondary" android:textSize="12sp"/>
+                    <TextView android:id="@+id/tvStreak" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_streak" android:textColor="@color/text_secondary" android:textSize="12sp"/>
                 </LinearLayout>
 
                 <View android:layout_width="1dp" android:layout_height="24dp" android:background="@color/app_surface_variant" android:layout_gravity="center"/>
@@ -174,8 +174,8 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
-                    <TextView android:id="@+id/tvThisWeek" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="This Week" android:textColor="@color/text_secondary" android:textSize="12sp"/>
+                    <TextView android:id="@+id/tvThisWeek" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_this_week" android:textColor="@color/text_secondary" android:textSize="12sp"/>
                 </LinearLayout>
 
                 <View android:layout_width="1dp" android:layout_height="24dp" android:background="@color/app_surface_variant" android:layout_gravity="center"/>
@@ -186,8 +186,8 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
-                    <TextView android:id="@+id/tvDuration" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0m" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Duration" android:textColor="@color/text_secondary" android:textSize="12sp"/>
+                    <TextView android:id="@+id/tvDuration" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0m" android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_duration" android:textColor="@color/text_secondary" android:textSize="12sp"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -195,7 +195,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Current Goal Progress"
+                android:text="@string/ui_current_goal_progress"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -236,7 +236,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="0%"
+                            android:text="@string/ui_0_1"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -251,7 +251,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Weekly Goal"
+                            android:text="@string/ui_weekly_goal"
                             android:textColor="@color/text_primary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -259,7 +259,7 @@
                             android:id="@+id/tvWeeklySubtext"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Keep going! You're doing great."
+                            android:text="@string/ui_keep_going_you_re_doing_great"
                             android:textColor="@color/text_secondary"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -268,7 +268,7 @@
                         android:id="@+id/tvWeeklyActivityDetails"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Details"
+                        android:text="@string/ui_details"
                         android:textColor="@color/orange_primary"
                         android:textSize="14sp"
                         android:textStyle="bold"
@@ -280,7 +280,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Discover Home Workouts"
+                android:text="@string/ui_discover_home_workouts"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -317,7 +317,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Bodyweight"
+                            android:text="@string/ui_bodyweight"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold"
@@ -348,7 +348,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Flexibility"
+                            android:text="@string/ui_flexibility"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold"
@@ -387,7 +387,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Library"
+                            android:text="@string/ui_library"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold"
@@ -418,7 +418,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Generator"
+                            android:text="@string/ui_generator"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold"
@@ -447,7 +447,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tip of the Day"
+                        android:text="@string/online_spotlight"
                         android:textColor="@color/orange_primary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -456,7 +456,7 @@
                         android:id="@+id/tvDailyTip"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Loading advice..."
+                        android:text="@string/online_loading"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:layout_marginTop="8dp"

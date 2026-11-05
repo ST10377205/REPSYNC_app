@@ -30,7 +30,7 @@
                     android:id="@+id/tvExerciseName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Exercise Name"
+                    android:text="@string/ui_exercise_name"
                     android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -39,7 +39,7 @@
                     android:id="@+id/tvExerciseCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Category"
+                    android:text="@string/ui_category"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -68,7 +68,7 @@
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="+ ADD SET"
+            android:text="@string/ui_add_set"
             android:textColor="@color/orange_primary"
             android:textStyle="bold"
             android:layout_marginTop="8dp" />

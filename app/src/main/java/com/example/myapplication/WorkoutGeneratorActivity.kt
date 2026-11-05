@@ -7,8 +7,6 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 
@@ -21,11 +19,8 @@ class WorkoutGeneratorActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workout_generator)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.workoutGeneratorMain)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, 0)
-            insets
-        }
+        applySystemBarInsets(R.id.workoutGeneratorMain)
+        setupToolbarNavigation()
 
         setupSelectionListeners()
         
@@ -39,25 +34,25 @@ class WorkoutGeneratorActivity : BaseActivity() {
     private fun setupSelectionListeners() {
         findViewById<MaterialCardView>(R.id.cvGoal).setOnClickListener {
             val goals = arrayOf("Build Muscle", "Lose Weight", "Improve Endurance", "Flexibility")
-            showSelectionDialog("Select Goal", goals) { selection ->
+            showSelectionDialog(getString(R.string.ui_select_goal), goals) { selection ->
                 selectedGoal = selection
-                findViewById<TextView>(R.id.tvSelectedGoal).text = selection
+                findViewById<TextView>(R.id.tvSelectedGoal).text = localizedText(selection)
             }
         }
 
         findViewById<MaterialCardView>(R.id.cvEquipment).setOnClickListener {
             val equipments = arrayOf("Home (No Equipment)", "Dumbbells Only", "Full Gym", "Resistance Bands")
-            showSelectionDialog("Select Equipment", equipments) { selection ->
+            showSelectionDialog(getString(R.string.ui_select_equipment), equipments) { selection ->
                 selectedEquipment = selection
-                findViewById<TextView>(R.id.tvSelectedEquipment).text = selection
+                findViewById<TextView>(R.id.tvSelectedEquipment).text = localizedText(selection)
             }
         }
 
         findViewById<MaterialCardView>(R.id.cvDays).setOnClickListener {
             val days = arrayOf("2 Days / Week", "3 Days / Week", "4 Days / Week", "5+ Days / Week")
-            showSelectionDialog("Select Frequency", days) { selection ->
+            showSelectionDialog(getString(R.string.ui_select_frequency), days) { selection ->
                 selectedDays = selection
-                findViewById<TextView>(R.id.tvSelectedDays).text = selection
+                findViewById<TextView>(R.id.tvSelectedDays).text = localizedText(selection)
             }
         }
     }
@@ -65,7 +60,7 @@ class WorkoutGeneratorActivity : BaseActivity() {
     private fun showSelectionDialog(title: String, items: Array<String>, onSelected: (String) -> Unit) {
         AlertDialog.Builder(this)
             .setTitle(title)
-            .setItems(items) { _, which ->
+            .setItems(items.map { localizedText(it) }.toTypedArray()) { _, which ->
                 onSelected(items[which])
             }
             .show()
@@ -114,7 +109,7 @@ class WorkoutGeneratorActivity : BaseActivity() {
         intent.putStringArrayListExtra("EXERCISE_CATEGORIES", categories)
         intent.putExtra("ROUTINE_TITLE", "$selectedGoal - $selectedEquipment")
         
-        Toast.makeText(this, "Home workout generated!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.ui_home_workout_generated), Toast.LENGTH_SHORT).show()
         startActivity(intent)
     }
 }

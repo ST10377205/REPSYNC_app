@@ -52,10 +52,14 @@ class StatsChartView @JvmOverloads constructor(
         super.onDraw(canvas)
         
         if (dataPoints.size < 2) {
-            val text = if (dataPoints.isEmpty()) "Start training to see progress!" else "Need at least 2 sessions for trends"
+            val text = if (dataPoints.isEmpty()) context.getString(R.string.chart_start) else context.getString(R.string.chart_sessions)
             val textSecondary = context.getColor(R.color.text_secondary)
             textPaint.color = textSecondary
-            canvas.drawText(text, width / 2f - 200f, height / 2f, textPaint)
+            textPaint.textSize = 28f
+            val availableWidth = (width - 32f).coerceAtLeast(1f)
+            val textWidth = textPaint.measureText(text)
+            if (textWidth > availableWidth) textPaint.textSize *= availableWidth / textWidth
+            canvas.drawText(text, (width - textPaint.measureText(text)) / 2f, height / 2f, textPaint)
             return
         }
 

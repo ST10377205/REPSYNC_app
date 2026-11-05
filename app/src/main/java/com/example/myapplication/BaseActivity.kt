@@ -3,14 +3,20 @@ package com.example.myapplication
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 open class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         applyAppTheme()
         super.onCreate(savedInstanceState)
+        PushNotifications.rememberLanguage(this)
     }
 
     private fun applyAppTheme() {
@@ -20,6 +26,25 @@ open class BaseActivity : AppCompatActivity() {
         
         if (AppCompatDelegate.getDefaultNightMode() != targetMode) {
             AppCompatDelegate.setDefaultNightMode(targetMode)
+        }
+    }
+
+    protected fun applySystemBarInsets(@IdRes rootViewId: Int) {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(rootViewId)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+    }
+
+    protected fun setupToolbarNavigation(
+        @IdRes toolbarId: Int = R.id.toolbar,
+        @StringRes contentDescriptionRes: Int = R.string.navigate_back,
+        onNavigateUp: () -> Unit = { onBackPressedDispatcher.onBackPressed() }
+    ) {
+        findViewById<MaterialToolbar>(toolbarId)?.apply {
+            navigationContentDescription = getString(contentDescriptionRes)
+            setNavigationOnClickListener { onNavigateUp() }
         }
     }
 

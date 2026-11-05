@@ -3,44 +3,44 @@ package com.example.myapplication
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.activity.addCallback
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import java.util.Locale
 
-/**
- * WorkoutSummaryActivity - Shows details at the end of a session.
- * Integrates with Retrofit WorkoutApiService to push completed data online.
- */
 class WorkoutSummaryActivity : BaseActivity() {
-
-    private val TAG = "WorkoutSummary"
-
+    private lateinit var workoutId: String
+    private var completedAt: Long = 0
+    private var ownerId: Int = -1
+    private var saving = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        workoutId = savedInstanceState?.getString("workout_id") ?: intent.getStringExtra("WORKOUT_ID") ?: java.util.UUID.randomUUID().toString()
+        completedAt = savedInstanceState?.getLong("completed_at") ?: System.currentTimeMillis()
+        ownerId = savedInstanceState?.getInt("workout_owner") ?: intent.getIntExtra("WORKOUT_OWNER_ID",
+            getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE).getInt("current_user_id", -1))
         setContentView(R.layout.activity_workout_summary)
-        Log.d(TAG, "onCreate: Initializing Workout Summary Layout Screen")
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.workoutSummaryMain)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, 0)
-            insets
+        applySystemBarInsets(R.id.workoutSummaryMain)
+        onBackPressedDispatcher.addCallback(this) {
+            if (!saving) showDiscardConfirmation()
         }
+        setupToolbarNavigation { onBackPressedDispatcher.onBackPressed() }
 
         displaySummaryData()
 
         findViewById<MaterialButton>(R.id.btnSaveWorkout).setOnClickListener {
-            Log.d(TAG, "Save button clicked - preparing data packages")
             saveAndExit()
         }
 
         findViewById<MaterialButton>(R.id.btnDiscardWorkout).setOnClickListener {
-            Log.d(TAG, "Discard button clicked - canceling session data generation")
-            finish()
+            showDiscardConfirmation()
         }
     }
 
@@ -48,68 +48,81 @@ class WorkoutSummaryActivity : BaseActivity() {
         val seconds = intent.getIntExtra("SESSION_TIME_SECONDS", 0)
         val minutes = seconds / 60
         val remainingSeconds = seconds % 60
-        findViewById<TextView>(R.id.tvSummaryTime).text = String.format("%02d:%02d", minutes, remainingSeconds)
+        findViewById<TextView>(R.id.tvSummaryTime).text =
+            String.format(Locale.getDefault(), "%02d:%02d", minutes, remainingSeconds)
+        findViewById<TextView>(R.id.tvSummaryVolume).text =
+            "${intent.getFloatExtra("TOTAL_VOLUME", 0f).toInt()} kg"
+        findViewById<TextView>(R.id.tvSummarySets).text =
+            intent.getIntExtra("COMPLETED_SETS", 0).toString()
+        findViewById<TextView>(R.id.tvSummaryPRs).text =
+            intent.getIntExtra("PERSONAL_RECORDS", 0).toString()
+    }
 
-        val sharedPreferences = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE)
-        val userId = sharedPreferences.getInt("current_user_id", -1)
-        
-        if (userId != -1) {
-            val history = sharedPreferences.getString("user_history_$userId", "") ?: ""
-            val lastSession = history.trim().split("\n").lastOrNull()
-            if (lastSession != null) {
-                val parts = lastSession.split(" • ")
-                if (parts.size >= 2) {
-                    findViewById<TextView>(R.id.tvSummaryVolume).text = parts[1]
-                }
-            }
-        }
-        
-        findViewById<TextView>(R.id.tvSummarySets).text = "12"
-        findViewById<TextView>(R.id.tvSummaryPRs).text = "1"
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("workout_id", workoutId)
+        outState.putLong("completed_at", completedAt)
+        outState.putInt("workout_owner", ownerId)
+        super.onSaveInstanceState(outState)
     }
 
     private fun saveAndExit() {
-        val sharedPreferences = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE)
-        val userId = sharedPreferences.getInt("current_user_id", -1)
-        val sessionSeconds = intent.getIntExtra("SESSION_TIME_SECONDS", 0)
-        val workoutTitle = intent.getStringExtra("ROUTINE_TITLE") ?: "General Workout"
-
-        if (userId != -1) {
-            Log.i(TAG, "Writing progress markers to offline storage cache for userId: $userId")
-            val currentDuration = sharedPreferences.getInt("user_duration_$userId", 0)
-            sharedPreferences.edit().apply {
-                putInt("user_duration_$userId", currentDuration + (sessionSeconds / 60))
-                putInt("user_push_day_progress_$userId", (20..100).random())
-                apply()
-            }
-
-            // REST API Integration asynchronously handled through background context
-            lifecycleScope.launch {
-                try {
-                    Log.i(TAG, "Dispatching outbound POST REST api payload to Firebase Cloud servers for userId: $userId")
-                    val apiService = WorkoutApiService.create()
-                    val cloudWorkout = CloudWorkout(
-                        userId = userId,
-                        workoutTitle = workoutTitle,
-                        durationMinutes = sessionSeconds / 60
-                    )
-                    
-                    // Upload specifically under the user's ID path to prevent data mixing
-                    val response = apiService.uploadWorkout(userId, cloudWorkout)
-                    Log.d(TAG, "Firebase Server responded with unique identification token: ${response.id}")
-                    Toast.makeText(this@WorkoutSummaryActivity, "Cloud Sync Successful", Toast.LENGTH_SHORT).show()
-                } catch (e: Exception) {
-                    Log.e(TAG, "Network transport failure caught gracefully. Defaulting to local offline storage schema.", e)
-                    Toast.makeText(this@WorkoutSummaryActivity, "Saved locally. Cloud sync pending connection.", Toast.LENGTH_SHORT).show()
-                }
-
-                val intent = Intent(this@WorkoutSummaryActivity, MainActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-                finish()
-            }
-        } else {
-            finish()
+        if (saving) return
+        val preferences = getSharedPreferences("RepSyncPrefs", Context.MODE_PRIVATE)
+        if (ownerId < 1 || preferences.getInt("current_user_id", -1) != ownerId) {
+            Toast.makeText(this, R.string.workout_account_changed, Toast.LENGTH_LONG).show()
+            return
         }
+        saving = true
+        findViewById<MaterialButton>(R.id.btnSaveWorkout).isEnabled = false
+        findViewById<MaterialButton>(R.id.btnDiscardWorkout).isEnabled = false
+        val notes = findViewById<TextInputEditText>(R.id.etWorkoutNotes).text?.toString()?.trim().orEmpty()
+        lifecycleScope.launch {
+            try {
+                WorkoutRepository(this@WorkoutSummaryActivity).save(ownerId, CompletedWorkout(
+                    workoutId, intent.getStringExtra("ROUTINE_TITLE") ?: "Workout", completedAt,
+                    intent.getIntExtra("SESSION_TIME_SECONDS", 0).coerceIn(0, 604800),
+                    intent.getFloatExtra("TOTAL_VOLUME", 0f).toDouble(),
+                    intent.getIntExtra("COMPLETED_SETS", 0).coerceIn(0, 10000), notes
+                ))
+                val exercises = intent.getStringArrayListExtra("PR_EXERCISES").orEmpty()
+                val weights = intent.getFloatArrayExtra("PR_WEIGHTS") ?: floatArrayOf()
+                preferences.edit().apply {
+                    if (notes.isNotEmpty()) putString("user_last_workout_notes_" + ownerId, notes)
+                    for (index in 0 until minOf(exercises.size, weights.size)) {
+                        val key = "user_pr_" + exercises[index]
+                        putFloat(key, maxOf(preferences.getFloat(key, 0f), weights[index]))
+                    }
+                    apply()
+                }
+                Toast.makeText(this@WorkoutSummaryActivity, R.string.ui_workout_saved_great_job, Toast.LENGTH_SHORT).show()
+                goHome()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                Toast.makeText(this@WorkoutSummaryActivity, R.string.workout_save_error, Toast.LENGTH_LONG).show()
+            } finally {
+                saving = false
+                if (!isFinishing && !isDestroyed) {
+                    findViewById<MaterialButton>(R.id.btnSaveWorkout).isEnabled = true
+                    findViewById<MaterialButton>(R.id.btnDiscardWorkout).isEnabled = true
+                }
+            }
+        }
+    }
+
+    private fun showDiscardConfirmation() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.ui_discard_session_5))
+            .setMessage(getString(R.string.ui_this_completed_workout_will_not_be_added_to_your_progress))
+            .setPositiveButton(getString(R.string.ui_discard)) { _, _ -> goHome() }
+            .setNegativeButton(getString(R.string.ui_keep_editing), null)
+            .show()
+    }
+
+    private fun goHome() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        startActivity(intent)
+        finish()
     }
 }

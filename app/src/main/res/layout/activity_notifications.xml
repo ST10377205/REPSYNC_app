@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/notificationsMain" android:orientation="vertical"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/app_background">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        app:title="@string/push_settings_title" app:titleTextColor="@color/text_primary"
+        app:navigationIcon="@drawable/ic_chevron_left" app:navigationIconTint="@color/text_primary" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:orientation="vertical" android:padding="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/push_settings_description" android:textSize="16sp" android:textColor="@color/text_primary" android:layout_marginBottom="24dp" />
+            <TextView android:id="@+id/tvNotificationPermission" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/push_disabled" android:textColor="@color/text_primary" android:layout_marginBottom="12dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnAllowNotifications" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/push_enable" android:textAllCaps="false" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnNotificationSystemSettings" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/push_system_settings" android:textAllCaps="false" />
+            <TextView android:id="@+id/tvPushConnection" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="@string/push_connecting" android:textColor="@color/text_primary" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnRetryPush" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/push_refresh" android:textAllCaps="false" />
+            <TextView android:id="@+id/tvLastPush" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/push_no_messages" android:textColor="@color/text_secondary" android:layout_marginTop="16dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnPreviewNotification" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:layout_marginTop="16dp" android:text="@string/push_preview" android:textAllCaps="false" />
+            <LinearLayout android:id="@+id/pushDeveloperTools" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="32dp" android:visibility="gone">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/push_diagnostics" android:textColor="@color/text_secondary" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnCopyPushToken" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/push_copy_token" android:textAllCaps="false" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

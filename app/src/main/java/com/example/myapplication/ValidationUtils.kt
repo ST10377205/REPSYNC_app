@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.util.Patterns
 
 /**
  * ValidationUtils - Utility class for validating user input fields.
@@ -11,7 +10,7 @@ object ValidationUtils {
      * Validates if the email is a proper email format.
      */
     fun isValidEmail(email: String): Boolean {
-        return email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        return email.matches(Regex("[A-Za-z0-9+_.%-]+@[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+"))
     }
 
     /**

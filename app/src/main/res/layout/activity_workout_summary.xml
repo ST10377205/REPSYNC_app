@@ -19,7 +19,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Workout Summary"
+            app:navigationIcon="@drawable/ic_chevron_left"
+            app:navigationIconTint="@color/text_primary"
+            app:title="@string/ui_workout_summary"
             app:titleTextColor="@color/text_primary"
             app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -55,7 +57,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Session Complete!"
+                android:text="@string/ui_session_complete"
                 android:textColor="@color/text_primary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -64,7 +66,7 @@
                 android:id="@+id/tvSummarySubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="You're getting stronger every day."
+                android:text="@string/ui_you_re_getting_stronger_every_day"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:layout_marginTop="4dp"
@@ -92,8 +94,8 @@
                         android:orientation="vertical"
                         android:padding="16dp"
                         android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="DURATION" android:textColor="@color/text_secondary" android:textSize="10sp" android:textStyle="bold"/>
-                        <TextView android:id="@+id/tvSummaryTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="00:00" android:textColor="@color/text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_duration_3" android:textColor="@color/text_secondary" android:textSize="10sp" android:textStyle="bold"/>
+                        <TextView android:id="@+id/tvSummaryTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_00_00" android:textColor="@color/text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -111,8 +113,8 @@
                         android:orientation="vertical"
                         android:padding="16dp"
                         android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="VOLUME" android:textColor="@color/text_secondary" android:textSize="10sp" android:textStyle="bold"/>
-                        <TextView android:id="@+id/tvSummaryVolume" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 kg" android:textColor="@color/orange_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_volume" android:textColor="@color/text_secondary" android:textSize="10sp" android:textStyle="bold"/>
+                        <TextView android:id="@+id/tvSummaryVolume" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0_kg" android:textColor="@color/orange_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -130,8 +132,8 @@
                         android:orientation="vertical"
                         android:padding="16dp"
                         android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SETS" android:textColor="@color/text_secondary" android:textSize="10sp" android:textStyle="bold"/>
-                        <TextView android:id="@+id/tvSummarySets" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_sets" android:textColor="@color/text_secondary" android:textSize="10sp" android:textStyle="bold"/>
+                        <TextView android:id="@+id/tvSummarySets" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0" android:textColor="@color/text_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -149,8 +151,8 @@
                         android:orientation="vertical"
                         android:padding="16dp"
                         android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="RECORDS" android:textColor="@color/text_secondary" android:textSize="10sp" android:textStyle="bold"/>
-                        <TextView android:id="@+id/tvSummaryPRs" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/orange_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_records" android:textColor="@color/text_secondary" android:textSize="10sp" android:textStyle="bold"/>
+                        <TextView android:id="@+id/tvSummaryPRs" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0" android:textColor="@color/orange_primary" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </GridLayout>
@@ -159,7 +161,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="Workout notes (optional)"
+                android:hint="@string/ui_workout_notes_optional"
                 app:boxCornerRadiusTopStart="16dp"
                 app:boxCornerRadiusTopEnd="16dp"
                 app:boxCornerRadiusBottomStart="16dp"
@@ -167,6 +169,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etWorkoutNotes"
+                            android:maxLength="4000"
                     android:layout_width="match_parent"
                     android:layout_height="120dp"
                     android:gravity="top"
@@ -178,7 +181,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:layout_marginTop="32dp"
-                android:text="DONE"
+                android:text="@string/ui_done"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:cornerRadius="16dp"
@@ -190,7 +193,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Discard session"
+                android:text="@string/ui_discard_session"
                 android:textColor="@color/text_secondary" />
 
         </LinearLayout>

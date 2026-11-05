@@ -21,7 +21,7 @@
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_chevron_left"
             app:navigationIconTint="@color/text_primary"
-            app:title="Exercise Library"
+            app:title="@string/ui_exercise_library"
             app:titleTextColor="@color/text_primary"
             app:titleCentered="true">
 
@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginEnd="8dp"
-                android:text="Start (0)"
+                android:text="@string/ui_start_0"
                 android:textColor="@color/orange_primary"
                 android:textStyle="bold"
                 android:visibility="gone" />
@@ -67,7 +67,7 @@
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
-                    android:hint="Search home exercises..."
+                    android:hint="@string/ui_search_home_exercises"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_secondary"
                     android:textSize="14sp"
@@ -75,6 +75,11 @@
                     android:inputType="text" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOnlineExercises" style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp" android:text="@string/online_title" />
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -96,7 +101,7 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="All"
+                    android:text="@string/ui_all"
                     android:checked="true" />
 
                 <com.google.android.material.chip.Chip
@@ -104,21 +109,21 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bodyweight" />
+                    android:text="@string/ui_bodyweight" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipDumbbell"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Dumbbell" />
+                    android:text="@string/ui_dumbbell" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipYoga"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Flexibility" />
+                    android:text="@string/ui_flexibility" />
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
     </com.google.android.material.appbar.AppBarLayout>
@@ -140,7 +145,7 @@
                 android:id="@+id/tvCreateCustom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="+ Can't find it? Add custom exercise"
+                android:text="@string/ui_can_t_find_it_add_custom_exercise"
                 android:textColor="@color/orange_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"

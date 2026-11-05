@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/onlineExercisesMain" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical" android:background="@color/app_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        app:title="@string/online_title" app:titleTextColor="@color/text_primary"
+        app:navigationIcon="@drawable/ic_chevron_left" app:navigationIconTint="@color/text_primary" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp" android:text="@string/online_intro" android:textColor="@color/text_secondary" />
+    <EditText android:id="@+id/etOnlineSearch" android:layout_width="match_parent" android:layout_height="48dp"
+        android:layout_marginHorizontal="20dp" android:hint="@string/online_search"
+        android:inputType="text" android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp" android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/tvOnlineStatus" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:accessibilityLiveRegion="polite" android:textColor="@color/text_secondary" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnOnlineRefresh"
+            style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="@string/online_refresh" />
+    </LinearLayout>
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:paddingHorizontal="20dp" android:paddingBottom="24dp">
+            <LinearLayout android:id="@+id/llOnlineExercises" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnOnlineMore"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/online_more" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

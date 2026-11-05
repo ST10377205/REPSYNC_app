@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid}/workouts/{workoutId} {
+      function ownsWorkouts() {
+        return request.auth != null && request.auth.uid == uid;
+      }
+      function validWorkout() {
+        let w = request.resource.data;
+        return w.keys().hasAll(['id', 'ownerUid', 'title', 'completedAt', 'durationSeconds', 'totalVolume', 'completedSets', 'notes'])
+          && w.keys().hasOnly(['id', 'ownerUid', 'title', 'completedAt', 'durationSeconds', 'totalVolume', 'completedSets', 'notes'])
+          && w.id == workoutId && w.ownerUid == uid
+          && w.title is string && w.title.size() > 0 && w.title.size() <= 200
+          && w.completedAt is int && w.completedAt > 0
+          && w.durationSeconds is int && w.durationSeconds >= 0 && w.durationSeconds <= 604800
+          && (w.totalVolume is int || w.totalVolume is float) && w.totalVolume >= 0 && w.totalVolume <= 1000000000
+          && w.completedSets is int && w.completedSets >= 0 && w.completedSets <= 10000
+          && w.notes is string && w.notes.size() <= 4000;
+      }
+      allow read: if ownsWorkouts();
+      allow create: if ownsWorkouts() && validWorkout();
+      // Completed workout events are immutable. Repeating the same upload is safe.
+      allow update: if ownsWorkouts() && validWorkout() && request.resource.data == resource.data;
+      allow delete: if ownsWorkouts();
+    }
+  }
+}

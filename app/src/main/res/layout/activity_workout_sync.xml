@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/workoutSyncMain" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/app_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        app:title="@string/sync_title" app:titleTextColor="@color/text_primary"
+        app:navigationIcon="@drawable/ic_chevron_left" app:navigationIconTint="@color/text_primary" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sync_description" android:textColor="@color/text_primary" android:textSize="16sp" android:layout_marginBottom="24dp" />
+            <TextView android:id="@+id/tvSyncStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sync_ready" android:textColor="@color/text_primary" android:textSize="18sp" android:accessibilityLiveRegion="polite" />
+            <TextView android:id="@+id/tvSyncCount" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_secondary" android:layout_marginTop="12dp" />
+            <TextView android:id="@+id/tvLastSync" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_secondary" android:layout_marginTop="8dp" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnSyncNow" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:layout_marginTop="16dp" android:text="@string/sync_now" android:textAllCaps="false" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnSyncGoogle" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/sync_connect_google" android:textAllCaps="false" android:visibility="gone" />
+            <LinearLayout android:id="@+id/llSyncWorkouts" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="24dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

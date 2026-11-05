@@ -6,8 +6,6 @@ import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -111,12 +109,12 @@ class ExerciseLibraryActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_library)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.exerciseLibraryMain)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, 0)
-            insets
-        }
+        applySystemBarInsets(R.id.exerciseLibraryMain)
+        setupToolbarNavigation()
 
+        findViewById<MaterialButton>(R.id.btnOnlineExercises).setOnClickListener {
+            startActivity(Intent(this, OnlineExercisesActivity::class.java))
+        }
         setupSearch()
         setupFilters()
         refreshList()
@@ -162,7 +160,7 @@ class ExerciseLibraryActivity : BaseActivity() {
 
         val filtered = allExercises.filter {
             (currentFilter == "All" || it.type == currentFilter) &&
-            (currentSearch.isEmpty() || it.name.lowercase().contains(currentSearch))
+            (currentSearch.isEmpty() || localizedText(it.name).lowercase().contains(currentSearch))
         }
 
         for (ex in filtered) {
@@ -194,14 +192,14 @@ class ExerciseLibraryActivity : BaseActivity() {
         }
 
         val tvName = TextView(this).apply {
-            text = ex.name
+            text = localizedText(ex.name)
             setTextColor(getColor(R.color.text_primary))
             textSize = 16f
             setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
         val tvCat = TextView(this).apply {
-            text = ex.category
+            text = localizedText(ex.category)
             setTextColor(getColor(R.color.text_secondary))
             textSize = 13f
             setPadding(0, 4, 0, 0)
@@ -209,7 +207,7 @@ class ExerciseLibraryActivity : BaseActivity() {
 
         // Dedicated text button to teach the user how the exercise is done
         val tvGuideLink = TextView(this).apply {
-            text = "→ View Guide & Instructions"
+            text = getString(R.string.ui_view_guide_instructions)
             setTextColor(getColor(R.color.orange_primary))
             textSize = 12f
             setPadding(0, 16, 0, 0)
@@ -218,9 +216,9 @@ class ExerciseLibraryActivity : BaseActivity() {
             isFocusable = true
             setOnClickListener {
                 MaterialAlertDialogBuilder(this@ExerciseLibraryActivity)
-                    .setTitle("How to perform: ${ex.name}")
-                    .setMessage(ex.instructions)
-                    .setPositiveButton("Got it!", null)
+                    .setTitle(getString(R.string.how_to, localizedText(ex.name)))
+                    .setMessage(localizedText(ex.instructions))
+                    .setPositiveButton(getString(R.string.ui_got_it), null)
                     .show()
             }
         }
@@ -247,7 +245,7 @@ class ExerciseLibraryActivity : BaseActivity() {
         val btn = findViewById<MaterialButton>(R.id.btnStartSelected)
         if (selectedExercises.isNotEmpty()) {
             btn.visibility = View.VISIBLE
-            btn.text = "Start (${selectedExercises.size})"
+            btn.text = getString(R.string.start_count, selectedExercises.size)
         } else {
             btn.visibility = View.GONE
         }

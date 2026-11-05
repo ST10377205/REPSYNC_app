@@ -10,7 +10,7 @@
         android:id="@+id/tvSetNumber"
         android:layout_width="32dp"
         android:layout_height="wrap_content"
-        android:text="1"
+        android:text="@string/ui_1"
         android:textColor="@color/text_primary"
         android:textStyle="bold" />
 
@@ -19,7 +19,7 @@
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_weight="1"
-        android:hint="KG"
+        android:hint="@string/ui_kg"
         android:inputType="numberDecimal"
         android:background="@drawable/bg_rounded_input"
         android:gravity="center"
@@ -30,7 +30,7 @@
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_weight="1"
-        android:hint="Reps"
+        android:hint="@string/ui_reps"
         android:inputType="number"
         android:background="@drawable/bg_rounded_input"
         android:gravity="center" />

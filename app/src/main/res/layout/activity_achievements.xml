@@ -19,7 +19,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Milestones"
+            app:navigationIcon="@drawable/ic_chevron_left"
+            app:navigationIconTint="@color/text_primary"
+            app:title="@string/ui_milestones"
             app:titleTextColor="@color/text_primary"
             app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -54,7 +56,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="YOUR PROGRESS"
+                        android:text="@string/ui_your_progress"
                         android:textColor="@color/orange_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
@@ -72,7 +74,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Level 0 Beginner"
+                            android:text="@string/ui_level_0_beginner"
                             android:textColor="@color/text_primary"
                             android:textSize="22sp"
                             android:textStyle="bold" />
@@ -81,7 +83,7 @@
                             android:id="@+id/tvTotalXp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 XP"
+                            android:text="@string/ui_0_xp"
                             android:textColor="@color/text_secondary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -101,7 +103,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="500 XP to Next Level"
+                        android:text="@string/ui_500_xp_to_next_level"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -110,7 +112,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trophies &amp; Badges"
+                android:text="@string/ui_trophies_badges"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -157,7 +159,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Consistency Master"
+                                android:text="@string/ui_consistency_master"
                                 android:textColor="@color/text_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -165,7 +167,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Reach a 10 day streak"
+                                android:text="@string/ui_reach_a_10_day_streak"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="12sp" />
 
@@ -183,7 +185,7 @@
                             android:id="@+id/tvAchievement1Status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Locked"
+                            android:text="@string/ui_locked"
                             android:textColor="@color/text_tertiary"
                             android:textSize="12sp"
                             android:textStyle="bold"
@@ -225,7 +227,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Volume Crusher"
+                                android:text="@string/ui_volume_crusher"
                                 android:textColor="@color/text_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -233,7 +235,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Lift a total of 10,000 kg"
+                                android:text="@string/ui_lift_a_total_of_10_000_kg"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -242,7 +244,7 @@
                             android:id="@+id/tvAchievement2Status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Locked"
+                            android:text="@string/ui_locked"
                             android:textColor="@color/text_tertiary"
                             android:textSize="12sp"
                             android:textStyle="bold"

@@ -19,7 +19,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Activity &amp; Progress"
+            app:navigationIcon="@drawable/ic_chevron_left"
+            app:navigationIconTint="@color/text_primary"
+            app:title="@string/ui_activity_progress"
             app:titleTextColor="@color/text_primary"
             app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -69,7 +71,7 @@
                             android:id="@+id/tvStreakBadge"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 Days"
+                            android:text="@string/ui_0_days"
                             android:textColor="@color/text_primary"
                             android:textSize="18sp"
                             android:textStyle="bold"
@@ -77,7 +79,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Current Streak"
+                            android:text="@string/ui_current_streak"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -107,7 +109,7 @@
                             android:id="@+id/tvWorkoutsThisWeek"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 Sessions"
+                            android:text="@string/ui_0_sessions"
                             android:textColor="@color/text_primary"
                             android:textSize="18sp"
                             android:textStyle="bold"
@@ -115,7 +117,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="This Week"
+                            android:text="@string/ui_this_week"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -126,7 +128,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Analytics &amp; Regression Line"
+                android:text="@string/ui_analytics_regression_line"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -165,7 +167,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Weight Lifted"
+                            android:text="@string/ui_weight_lifted"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:layout_marginEnd="16dp"/>
@@ -177,18 +179,18 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Regression Trend"
+                            android:text="@string/ui_regression_trend"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"/>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Saved Plans Section -->
+            <!-- Saved Plans Section (Addresses second requirement) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="My Generated Plans"
+                android:text="@string/ui_my_generated_plans"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -215,7 +217,7 @@
                         android:id="@+id/tvNoSavedPlans"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="No generated plans saved yet. Go to Plan Generator to make one!"
+                        android:text="@string/ui_no_generated_plans_saved_yet_go_to_plan_generator_to_make_one"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:gravity="center"
@@ -227,7 +229,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Personal Records"
+                android:text="@string/ui_personal_records"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -253,7 +255,7 @@
                         android:id="@+id/tvNoPRs"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="No records set yet. Time to hit the home gym!"
+                        android:text="@string/ui_no_records_set_yet_time_to_hit_the_home_gym"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:gravity="center"
@@ -273,48 +275,11 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Cloud Synced Workouts (REST API Live Check) -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cloud Sync Feed (REST API)"
-                android:textColor="@color/text_primary"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <LinearLayout
-                android:id="@+id/llCloudHistoryContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="24dp">
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cvNoCloudHistory"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/app_surface_variant"
-                    app:strokeWidth="1dp">
-                    <TextView
-                        android:id="@+id/tvCloudHistoryStatus"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Fetching data from online database..."
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp"
-                        android:gravity="center"
-                        android:padding="24dp" />
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
             <!-- Workout History -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Local Workout History"
+                android:text="@string/ui_workout_history"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -339,7 +304,7 @@
                         android:id="@+id/tvNoHistory"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Your journey starts with session #1.\nReady to begin?"
+                        android:text="@string/ui_your_journey_starts_with_session_1_nready_to_begin"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:gravity="center"
